@@ -29,7 +29,7 @@ Route::post('/posts/edit/{id}', 'PostController@postEdit')->name('posts/edit')->
 Route::get('/posts/search/{query}', 'PostController@search')->name('posts/search')->middleware('checkLogin')->middleware('checkPermission');
 Route::get('/posts/status_pending/{id}', 'PostController@pending')->name('posts/status_pending')->middleware('checkLogin')->middleware('checkPermission');
 Route::get('/posts/status_publish/{id}', 'PostController@publish')->name('posts/status_publish')->middleware('checkLogin')->middleware('checkPermission');
-Route::get('/posts/status_delete/{id}', 'PostController@edit')->name('posts/status_delete')->middleware('checkLogin')->middleware('checkPermission');
+Route::get('/posts/status_delete/{id}', 'PostController@delete')->name('posts/status_delete')->middleware('checkLogin')->middleware('checkPermission');
 
 Route::get('/category', 'CategoryController@index')->name('catnews')->middleware('checkLogin')->middleware('checkPermission');
 Route::get('/category/edit/{id}', 'CategoryController@edit')->name('catnews/edit')->middleware('checkLogin')->middleware('checkPermission');

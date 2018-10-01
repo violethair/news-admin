@@ -35,25 +35,12 @@ class PostController extends Controller
         	'content' => 'required',
         	'shortdes' => 'required',
         	'cat_id' => 'required',
-        	'tags' => 'required'
+        	'tags' => 'required',
+            'avatar' => 'required'
 	    ]);
 
 	    if ($validator->fails()) {
 	    	Session::flash('error',$validator->errors()->first());
-	    	return redirect()->back()->withInput($req->input());
-        }
-
-        if ($req->hasFile('avatar')) {
-            $file = $req->avatar;
-            $date = date('d-m-Y');
-	        $path = base_path() . env('UPLOAD_AVATAR_PATH') . '/' . $date;
-	        if (!file_exists($path)) {
-			    mkdir($path, 0777, true);
-			}
-			$avatarFileName = str_random(64) . '.' . $file->getClientOriginalExtension();
-	        $file->move($path, $avatarFileName);
-        } else {
-        	Session::flash('error','Please choose avatar file');
 	    	return redirect()->back()->withInput($req->input());
         }
 
@@ -65,7 +52,7 @@ class PostController extends Controller
         $post->meta_des = $req->shortdes;
         $post->tag = $req->tags;
         $post->meta_key = $req->tags;
-        $post->images = 'iholding.io/' . $date . '/' . $avatarFileName;
+        $post->images = $req->avatar;
         $post->link = $this->toAscii($req->title);
         $post->user_id_edit = Session::get('user')->id;
         $post->status = 'pending';

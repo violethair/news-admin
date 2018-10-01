@@ -103,6 +103,7 @@
 											<label class="col-form-label" style="padding-left: 15px;">Avatar</label>
 											<div class="col-lg-12 col-md-12 col-sm-12">
 												<div class="custom-file">
+													<input type="hidden" name="avatar">
 													<input type="file" name="avatar" class="custom-file-input" id="customFile">
 													<label class="custom-file-label" for="customFile">Choose file</label>
 												</div>
@@ -155,7 +156,7 @@
 	var Autosize={init:function(){var i,t;i=$("#m_autosize_1"),t=$("#m_autosize_2"),autosize(i),autosize(t),autosize.update(t)}};jQuery(document).ready(function(){Autosize.init()});
 	$(document).ready(function () {
 
-		function uploadImage(image) {
+		function uploadImage(image, callback) {
 		    var data = new FormData();
 		    data.append("image", image);
 		    $.ajax({
@@ -166,8 +167,7 @@
 		        data: data,
 		        type: "post",
 		        success: function(res) {
-		            var image = $('<img>').attr('src', '{{env('API_URL')}}/postThumb/' + res.data);
-		            $('#summernote').summernote("insertNode", image[0]);
+		            callback(res);
 		        },
 		        error: function(data) {
 		            console.log(data);
@@ -179,7 +179,10 @@
 		    height: 450,
 		    callbacks: {
 		        onImageUpload: function(image) {
-		            uploadImage(image[0]);
+		            uploadImage(image[0], function (res) {
+		            	var image = $('<img>').attr('src', '{{env('API_URL')}}/postThumb/' + res.data);
+		            	$('#summernote').summernote("insertNode", image[0]);
+		            });
 		        }
 		    }
 		});
@@ -204,16 +207,13 @@
 			$(".show-avatar").hide();
 			input = this;
 			if (input.files && input.files[0]) {
-	            var reader = new FileReader();
-
-	            reader.onload = function (e) {
-	                $('.show-avatar img')
-	                    .attr('src', e.target.result)
+				uploadImage(input.files[0], function (res) {
+					$("[name='avatar']").attr('value', res.data);
+					$('.show-avatar img')
+	                    .attr('src', '{{env('API_URL')}}/postThumb/' + res.data)
 	                    .height(200);
                     $(".show-avatar").show('fast');
-	            };
-
-	            reader.readAsDataURL(input.files[0]);
+	            });
 	        }
 		});
 	});
