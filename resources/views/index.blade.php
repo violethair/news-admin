@@ -21,6 +21,7 @@
 		<!-- END: Left Aside -->
 		<div class="m-grid__item m-grid__item--fluid m-wrapper">
 			<div class="m-content">
+				@include('layouts.searchPost')
 				<div class="m-portlet ">
 					<div class="m-portlet__body  m-portlet__body--no-padding">
 						<div class="row m-row--no-padding m-row--col-separator-xl">
@@ -35,7 +36,7 @@
 								            All Post Value
 								        </span>
 								        <span class="m-widget24__stats m--font-brand">
-								            1800
+								            {{$data['totalPost']}}
 								        </span>		
 								        <div class="m--space-10"></div>
 										<div class="progress m-progress--sm">
@@ -56,7 +57,7 @@
 								            All Category Value
 								        </span>
 								        <span class="m-widget24__stats m--font-info">
-								            1349
+								            {{$data['totalCategory']}}
 								        </span>		
 								        <div class="m--space-10"></div>
 										<div class="progress m-progress--sm">
@@ -77,7 +78,7 @@
 								            All Press Release Value
 								        </span>
 								        <span class="m-widget24__stats m--font-danger">
-								            567
+								            {{$data['totalPressRelease']}}
 								        </span>		
 								        <div class="m--space-10"></div>
 										<div class="progress m-progress--sm">
@@ -98,7 +99,7 @@
 								            All Video Value
 								        </span>
 								        <span class="m-widget24__stats m--font-success">
-								            276 
+								            {{$data['totalVideo']}} 
 								        </span>		
 								        <div class="m--space-10"></div>
 								        <div class="progress m-progress--sm">
@@ -112,13 +113,13 @@
 					</div>
 				</div>
 				<div style="text-align: center">
-					<a href="{{env('APP_URL')}}/category/new" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air" style="margin-right: 20px;">
+					<a href="{{env('APP_URL')}}/category/add" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air" style="margin-right: 20px;">
 						<span>
 							<i class="fa flaticon-add"></i>
 							<span>New Category</span>
 						</span>
 					</a>
-					<a href="{{env('APP_URL')}}/post/new" class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air">
+					<a href="{{env('APP_URL')}}/posts/new" class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air">
 						<span>
 							<i class="fa flaticon-add-circular-button"></i>
 							<span>New Post</span>

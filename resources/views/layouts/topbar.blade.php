@@ -50,9 +50,9 @@
 				<button class="m-aside-header-menu-mobile-close  m-aside-header-menu-mobile-close--skin-dark " id="m_aside_header_menu_mobile_close_btn"><i class="la la-close"></i></button>
 				<div id="m_header_menu" class="m-header-menu m-aside-header-menu-mobile m-aside-header-menu-mobile--offcanvas  m-header-menu--skin-light m-header-menu--submenu-skin-light m-aside-header-menu-mobile--skin-dark m-aside-header-menu-mobile--submenu-skin-dark ">
 					<ul class="m-menu__nav">
-						<li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"><a href="{{env('APP_URL')}}/post/new" class="m-menu__link" title="Non functional dummy link"><i class="m-menu__link-icon flaticon-add"></i><span class="m-menu__link-text">New Category</span></a>
+						<li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"><a href="{{env('APP_URL')}}/category/add" class="m-menu__link" title="Non functional dummy link"><i class="m-menu__link-icon flaticon-add"></i><span class="m-menu__link-text">New Category</span></a>
 						</li>
-						<li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"><a href="{{env('APP_URL')}}/post/new" class="m-menu__link" title="Non functional dummy link"><i class="m-menu__link-icon flaticon-add-circular-button"></i><span class="m-menu__link-text"><b>New Post</b></span></a>
+						<li class="m-menu__item  m-menu__item--submenu m-menu__item--rel"><a href="{{env('APP_URL')}}/posts/add" class="m-menu__link" title="Non functional dummy link"><i class="m-menu__link-icon flaticon-add-circular-button"></i><span class="m-menu__link-text"><b>New Post</b></span></a>
 						</li>
 					</ul>
 				</div>
@@ -67,9 +67,9 @@
 							 m-dropdown-toggle="click">
 								<a href="#" class="m-nav__link m-dropdown__toggle">
 									<span class="m-topbar__userpic">
-										<img src="{{env('APP_URL')}}/public/assets/app/media/img/users/user4.jpg" class="m--img-rounded m--marginless" alt="" />
+										<img src="{{env('APP_URL')}}/public/assets/app/media/img/users/user1.jpg" class="m--img-rounded m--marginless" alt="" />
 									</span>
-									<span class="m-topbar__username m--hide">Nick</span>
+									<span class="m-topbar__username m--hide">{{Session::get('user')->name}}</span>
 								</a>
 								<div class="m-dropdown__wrapper">
 									<span class="m-dropdown__arrow m-dropdown__arrow--right m-dropdown__arrow--adjust"></span>
@@ -77,11 +77,11 @@
 										<div class="m-dropdown__header m--align-center" style="background: url(assets/app/media/img/misc/user_profile_bg.jpg); background-size: cover;">
 											<div class="m-card-user m-card-user--skin-dark">
 												<div class="m-card-user__pic">
-													<img src="{{env('APP_URL')}}/public/assets/app/media/img/users/user4.jpg" class="m--img-rounded m--marginless" alt="" />
+													<img src="{{env('APP_URL')}}/public/assets/app/media/img/users/user1.jpg" class="m--img-rounded m--marginless" alt="" />
 												</div>
 												<div class="m-card-user__details">
-													<span class="m-card-user__name m--font-weight-500">Mark Andre</span>
-													<a href="" class="m-card-user__email m--font-weight-300 m-link">mark.andre@gmail.com</a>
+													<span class="m-card-user__name m--font-weight-500">{{Session::get('user')->name}}</span>
+													<a href="" class="m-card-user__email m--font-weight-300 m-link">{{Session::get('user')->email}}</a>
 												</div>
 											</div>
 										</div>

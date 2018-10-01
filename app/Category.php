@@ -7,4 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
    	public $table = 'catproducts';
+   	public $timestamps = false;
 }
