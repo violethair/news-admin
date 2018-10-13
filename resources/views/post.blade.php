@@ -28,55 +28,6 @@
 						<div class="m-portlet__head-caption">
 							<div class="m-portlet__head-title">
 								<h3 class="m-portlet__head-text">
-									Pending Post
-								</h3>
-							</div>
-						</div>
-						<div class="m-portlet__head-tools">
-							<ul class="m-portlet__nav">
-								<li class="m-portlet__nav-item">
-									<a href="{{env('APP_URL')}}/posts/add" class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--air">
-										<span>
-											<i class="la la-plus"></i>
-											<span>New Post</span>
-										</span>
-									</a>
-								</li>
-								<li class="m-portlet__nav-item"></li>
-							</ul>
-						</div>
-					</div>
-					<div class="m-portlet__body">
-						<!--begin: Datatable -->
-						<table class="table table-striped- table-bordered table-hover table-checkable" id="m_table_2">
-							<thead>
-								<tr>
-									<th>ID</th>
-									<th>Category</th>
-									<th>Title</th>
-									<th>Status</th>
-									<th>Actions</th>
-								</tr>
-							</thead>
-							<tbody>
-								@foreach($data as $key=>$value)
-								<tr>
-									<td>{{ $value['id'] }}</td>
-									<td>{{ $value['category'] }}</td>
-									<td><b>{{ $value['name'] }}</b></td>
-									<td>{{ $value['status'] }}</td>
-									<td nowrap></td>
-								</tr>
-								@endforeach
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<div class="m-portlet m-portlet--mobile">
-					<div class="m-portlet__head">
-						<div class="m-portlet__head-caption">
-							<div class="m-portlet__head-title">
-								<h3 class="m-portlet__head-text">
 									List Post
 								</h3>
 							</div>
@@ -91,15 +42,15 @@
 									<th>ID</th>
 									<th>Category</th>
 									<th>Title</th>
+									<th>User</th>
 									<th>Publish Date</th>
 									<th>Status</th>
-									<th>Actions</th>
+									<th width="150">Actions</th>
 								</tr>
 							</thead>
 							<tbody>
 							</tbody>
 						</table>
-						<center><button type="button" data-page=1 class="btn m-btn--pill m-btn--air m-btn m-btn--gradient-from-info m-btn--gradient-to-accent btn-load-more">Load more</button></center>
 					</div>
 				</div>
 			</div>
@@ -122,22 +73,100 @@
 </body>
 <script src="{{env('APP_URL')}}/public/assets/vendors/custom/datatables/datatables.bundle.js" type="text/javascript"></script>
 <script type="text/javascript">
-var dataTable = null;
+var t;
+$.fn.dataTable.Api.register("column().title()", function() {
+    return $(this.header()).text().trim()
+});
 var DatatablesBasicPaginations = {
     init: function(data) {
-        dataTable = $("#m_table_1").DataTable({
-        	data: data,
+        t = $("#m_table_1").DataTable({
+        	"pageLength": 50,
+        	"processing": true,
+	        "serverSide": true,
+	        "ajax": "{{env('APP_URL')}}/api/loadMorePost",
+	        initComplete: function() {
+                var a = $('<tr class="filter"></tr>').appendTo($(t.table().header()));
+                this.api().columns().every(function() {
+                    var e;
+                    switch (this.title()) {
+                        case "ID":
+                        case "Title":
+                        	e = $('<input type="text" class="form-control form-control-sm form-filter m-input" data-col-index="' + this.index() + '"/>');
+                                break;
+                        case "User":
+                            var n = {!! $data['userJson'] !!};
+                            e = $('<select class="form-control form-control-sm form-filter m-input" title="Select" data-col-index="' + this.index() + '"><option value="">Select</option></select>'), 
+                            	$.each(n, function (key,val) {
+                            		$(e).append('<option value="' + val.id + '">' + val.name + "</option>")
+                            	})
+                        	break;
+                        case "Category":
+                        	var n = {!! $data['categoryJson'] !!};
+                            e = $('<select class="form-control form-control-sm form-filter m-input" title="Select" data-col-index="' + this.index() + '"><option value="">Select</option></select>'), 
+                            	$.each(n, function (key,val) {
+                            		$(e).append('<option value="' + val.id + '">' + val.name + "</option>")
+                            	})
+                        	break;
+                        case "Status":
+                        	var n = [{id: "pending", name: "Pending"}, {id: "publish", name: "Published"}, {id: "delete", name: "Deleted"}];
+                            e = $('<select class="form-control form-control-sm form-filter m-input" title="Select" data-col-index="' + this.index() + '"><option value="">Select</option></select>'), 
+                            	$.each(n, function (key,val) {
+                            		$(e).append('<option value="' + val.id + '">' + val.name + "</option>")
+                            	})
+                        	break;
+                        case "Actions":
+                            var i = $('<button class="btn btn-brand m-btn btn-sm m-btn--icon" style="height: 20px;width: 39px;"><span><i class="la la-search"></i><span></span>  </span></button>'),
+                                s = $('<button class="btn btn-secondary m-btn btn-sm m-btn--icon" style="height: 20px;width: 39px;margin-top:0px;margin-left:10px">\n\t\t\t\t\t\t\t  <span>\n\t\t\t\t\t\t\t    <i class="la la-close"></i>\n\t\t\t\t\t\t\t    <span></span>\n\t\t\t\t\t\t\t  </span>\n\t\t\t\t\t\t\t</button>');
+                            $("<th>").append(i).append(s).appendTo(a), $(i).on("click", function(e) {
+                                e.preventDefault();
+                                var n = {};
+                                $(a).find(".m-input").each(function() {
+                                    var t = $(this).data("col-index");
+                                    n[t] ? n[t] += "|" + $(this).val() : n[t] = $(this).val()
+                                }), $.each(n, function(a, e) {
+                                    t.column(a).search(e || "", !1, !1)
+                                }), t.table().draw()
+                            }), $(s).on("click", function(e) {
+                                e.preventDefault(), $(a).find(".m-input").each(function(a) {
+                                    $(this).val(""), t.column($(this).data("col-index")).search("", !1, !1)
+                                }), t.table().draw()
+                            })
+                    }
+                    $(e).appendTo($("<th>").appendTo(a))
+                }), $("#m_datepicker_1,#m_datepicker_2").datepicker()
+            },
         	order: [[0,'desc']],
-        	paging: false,
+        	paging: true,
             responsive: !0,
             pagingType: "full_numbers",
+            "columns": [
+		        { "name": "id"},
+		        { "name": "cat_id"},
+		        { "name": "name"},
+		        { "name": "user_id"},
+		        { "name": "publish_at"},
+		        { "name": "status"},
+		        { "name": "action"},
+		    ],
             columnDefs: [{
                 targets: -1,
                 title: "Actions",
                 orderable: !1,
                 render: function(a, e, n, t) {
+
                 	console.log(n);
-                    return '\n<a href="{{env('APP_URL')}}/posts/edit/'+n[0]+'" class="m-portlet__nav-link btn m-btn btn btn-outline-primary m-btn--icon m-btn--icon-only m-btn--pill" title="Edit">\n<i class="la la-edit"></i>\n</a>\n<a href="{{env('APP_URL')}}/posts/status_pending/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Pending">\n<i class="la la-clock-o"></i>\n</a>\n<a href="{{env('APP_URL')}}/posts/status_delete/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete">\n<i class="la la-trash"></i>\n</a>'
+
+                	var html = '\n<a style="margin-right:5px" href="{{env('APP_URL')}}/posts/edit/'+n[0]+'" class="m-portlet__nav-link btn m-btn btn btn-outline-primary m-btn--icon m-btn--icon-only m-btn--pill" title="Edit">\n<i class="la la-edit"></i>\n</a>';
+
+                	if(n[5] != 'pending') {
+                		html += '<a style="margin-right:5px" href="{{env('APP_URL')}}/posts/status_pending/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-warning m-btn--icon m-btn--icon-only m-btn--pill" title="Pending">\n<i class="la la-clock-o"></i>\n</a>';
+                	} else {
+                		html += '<a style="margin-right:5px" href="{{env('APP_URL')}}/posts/status_publish/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-success m-btn--icon m-btn--icon-only m-btn--pill btn-publish" title="Publish"><i class="la la-check"></i>\n</a>';
+                	}
+
+                    html += '<a href="{{env('APP_URL')}}/posts/status_delete/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete">\n<i class="la la-trash"></i>\n</a>'
+
+                    return html;
                 }
             }, {
             	targets: 2,
@@ -146,7 +175,7 @@ var DatatablesBasicPaginations = {
             	}
             },
             {
-                targets: 4,
+                targets: 5,
                 render: function(a, e, n, t) {
                     var s = {
                         'pending': {
@@ -172,61 +201,9 @@ var DatatablesBasicPaginations = {
         })
     }
 };
-var DatatablesBasicPaginations1 = {
-    init: function(data) {
-        $("#m_table_2").DataTable({
-        	data: data,
-        	order: [[0,'desc']],
-        	paging: false,
-            responsive: !0,
-            pagingType: "full_numbers",
-            columnDefs: [{
-                targets: -1,
-                title: "Actions",
-                orderable: !1,
-                render: function(a, e, n, t) {
-                	console.log(n);
-                    return '\n<a href="{{env('APP_URL')}}/posts/edit/'+n[0]+'" class="m-portlet__nav-link btn m-btn btn btn-outline-primary m-btn--icon m-btn--icon-only m-btn--pill" title="Edit">\n<i class="la la-edit"></i>\n</a>\n<a href="{{env('APP_URL')}}/posts/status_publish/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-success m-btn--icon m-btn--icon-only m-btn--pill btn-publish" title="Publish">\n<i class="la la-check"></i>\n</a>\n<a href="{{env('APP_URL')}}/posts/status_delete/'+n[0]+'" class="m-portlet__nav-link btn btn-outline-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete">\n<i class="la la-trash"></i>\n</a>'
-                }
-            }, {
-            	targets: 2,
-            	render : function (a,e,n,t){
-            		return '<b>'+a+'</b>';
-            	}
-            },
-            {
-                targets: 3,
-                render: function(a, e, n, t) {
-                    var s = {
-                        'pending': {
-                            title: "Pending",
-                            class: "m-badge--warning"
-                        },
-                        'draff': {
-                            title: "Draff",
-                            class: "m-badge--primary"
-                        },
-                        'publish': {
-                            title: "Published",
-                            class: " m-badge--success"
-                        },
-                        'delete': {
-                            title: "Deleted",
-                            class: " m-badge--danger"
-                        }
-                    };
-                    return void 0 === s[a] ? a : '<span class="m-badge ' + s[a].class + ' m-badge--wide">' + s[a].title + "</span>"
-                }
-            }]
-        })
-    }
-};
+
 jQuery(document).ready(function() {
-	$.get('{{env('APP_URL')}}/api/loadMorePost', function (res) {
-		var res = JSON.parse(res);
-		DatatablesBasicPaginations.init(res);
-		DatatablesBasicPaginations1.init();
-	});
+	DatatablesBasicPaginations.init();
 
 	$(".btn-load-more").click(function () {
 		$(this).addClass('m-loader m-loader--right m-loader--light');

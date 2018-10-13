@@ -28,7 +28,7 @@
 		<div class="m-grid__item m-grid__item--fluid m-wrapper">
 			<div class="m-content">
 				<div class="row">
-					<div class="col-lg-6">
+					<div class="col-lg-12">
 						<div class="m-portlet m-portlet--last m-portlet--head-lg m-portlet--responsive-mobile" id="main_portlet">
 							<div class="m-portlet__head">
 								<div class="m-portlet__head-progress">
@@ -45,14 +45,18 @@
 										</div>
 									</div>
 									<div class="m-portlet__head-tools">
-										<div class="btn-group">
-											<button type="button" class="btn btn-brand  m-btn m-btn--icon m-btn--wide m-btn--md btn-post">
-												<span>
-													<i class="la la-check"></i>
-													<span>Save</span>
-												</span>
-											</button>
-										</div>
+										<button type="button" style="margin-right: 10px;" class="btn btn-brand  m-btn m-btn--icon m-btn--wide m-btn--md btn-preview">
+											<span>
+												<i class="flaticon-eye"></i>
+												<span>Preview</span>
+											</span>
+										</button>
+										<button type="button" class="btn btn-accent  m-btn m-btn--icon m-btn--wide m-btn--md btn-post">
+											<span>
+												<i class="la la-check"></i>
+												<span>Save</span>
+											</span>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -94,6 +98,20 @@
 											</div>
 										</div>
 										<div class="form-group m-form__group row">
+											<label class="col-form-label" style="padding-left: 15px;">Sub Category</label>
+											<div class="col-lg-12 col-md-12 col-sm-12">
+												<select class="form-control m-select2" id="m_select2_3" name="sub_cat_id[]" multiple="multiple">
+													@foreach($data['category'] as $key=>$value)
+													@if(in_array($value['id'],$data['cat_after']))
+													<option value="{{$value['id']}}" selected="selected">{{$value['name']}}</option>
+													@else
+													<option value="{{$value['id']}}">{{$value['name']}}</option>
+													@endif
+													@endforeach
+												</select>
+											</div>
+										</div>
+										<div class="form-group m-form__group row">
 											<label class="col-form-label" style="padding-left: 15px;">Tags</label>
 											<div class="col-lg-12 col-md-12 col-sm-12">
 												<input type="text" name="tags" class="form-control m-input" placeholder="Add tags" data-role="tagsinput" value="{{ $data['tag'] }}">
@@ -110,13 +128,35 @@
 												<div class="show-avatar" style="margin-top: 10px;border-radius: 4px;overflow: hidden;display: inline-block;border: 2px dashed #5867dd"><img src="{{env('API_URL')}}/postThumb/{{ $data['images'] }}" style="height: 200px"></div>
 											</div>
 										</div>
+										<div class="form-group m-form__group row">
+											<label class="col-form-label" style="padding-left: 15px;">Reference link</label>
+											<div class="col-lg-12 col-md-12 col-sm-12">
+												<input type="text" name="reference_link" class="form-control m-input" placeholder="Reference link" value="{{ $data['link_thamkhao'] }}">
+											</div>
+										</div>
+										<div class="form-group m-form__group row">
+											<label class="col-form-label" style="padding-left: 15px;">Related Post</label>
+											<div class="col-lg-12 col-md-12 col-sm-12">
+												<select class="form-control m-select2" id="m_select2_4" name="related_id[]" multiple="multiple">
+												@foreach ($data['relate_id'] as $value)
+												<option value="{{$value['id']}}" selected="selected">{{$value['name']}}</option>
+												@endforeach
+												</select>
+											</div>
+										</div>
+										<div class="form-group m-form__group row">
+											<label class="col-form-label" style="padding-left: 15px;">Publish Schedule</label>
+											<div class="col-lg-12 col-md-12 col-sm-12">
+												<input value="{{ $data['publish_schedule'] }}" type="text" name="publish_schedule" class="form-control" id="m_datetimepicker_1" readonly placeholder="Select date & time to publish schedule" />
+											</div>
+										</div>
 									</div>
 								</form>
 							</div>
 						</div>
 					</div>
-					<div class="col-lg-6">
-						<div class="m-portlet">
+					<div class="col-lg-12">
+						<div class="m-portlet preview-wrap" style="margin-top: 20px">
 							<div class="m-portlet__head">
 								<div class="m-portlet__head-caption">
 									<div class="m-portlet__head-title">
@@ -155,6 +195,75 @@
 <script type="text/javascript">
 	var Autosize={init:function(){var i,t;i=$("#m_autosize_1"),t=$("#m_autosize_2"),autosize(i),autosize(t),autosize.update(t)}};jQuery(document).ready(function(){Autosize.init()});
 	$(document).ready(function () {
+
+		$("#m_datetimepicker_1").datetimepicker({
+            todayHighlight: !0,
+            autoclose: !0,
+            format: "yyyy-mm-dd hh:ii:00"
+        });
+
+		function formatRepo (repo) {
+			return repo.name;
+		}
+
+		function formatRepoSelection (repo) {
+		  	return repo.name || repo.text;
+		}
+
+		$('#m_select2_4').select2({
+			ajax: {
+			  	url: function (params) {
+			      return '{{env('APP_URL')}}/posts/search/' + params.term;
+			    },
+			    processResults: function (data) {
+			      return {
+			        results: JSON.parse(data)
+			      };
+			    }
+			},
+		   	templateResult: formatRepo,
+  			templateSelection: formatRepoSelection
+		});
+
+
+		$('.summernote').summernote({
+			height: 400,
+			popover: {
+			  image: [
+			    ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+			    ['float', ['floatLeft', 'floatRight', 'floatNone']],
+			    ['remove', ['removeMedia']]
+			  ],
+			  link: [
+			    ['link', ['linkDialogShow', 'unlink']]
+			  ],
+			  air: [
+			    ['color', ['color']],
+			    ['font', ['bold', 'underline', 'clear']],
+			    ['para', ['ul', 'paragraph']],
+			    ['table', ['table']],
+			    ['insert', ['link', 'picture']]
+			  ]
+			},
+			fontSizes : ["8","10","12","14","16","18","20","22","24","26","28","30","32","34","36","38","40","42","44","46","48","50","52","54","56","58","60","62","64","66","68","70","72"],
+		  	toolbar: [
+		  		['fontname', ['fontname']],
+				['style', ['bold', 'italic', 'underline', 'clear']],
+			    ['font', ['strikethrough', 'superscript', 'subscript']],
+			    ['fontsize', ['fontsize']],
+			    ['color', ['color']],
+			    ['para', ['ul', 'ol', 'paragraph']],
+			    ['height', ['height']],
+			    ['insert', ['picture','link', 'video', 'table']],
+			    ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']]
+			],
+		});
+
+		$(".btn-preview").click(function() {
+		    $([document.documentElement, document.body]).animate({
+		        scrollTop: $(".preview-wrap").offset().top
+		    }, 500);
+		});
 
 		function uploadImage(image, callback) {
 		    var data = new FormData();
