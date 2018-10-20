@@ -119,7 +119,7 @@
 							<span>New Category</span>
 						</span>
 					</a>
-					<a href="{{env('APP_URL')}}/posts/new" class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air">
+					<a href="{{env('APP_URL')}}/posts/add" class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--pill m-btn--air">
 						<span>
 							<i class="fa flaticon-add-circular-button"></i>
 							<span>New Post</span>

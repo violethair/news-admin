@@ -43,7 +43,7 @@
 									<th>Category</th>
 									<th>Title</th>
 									<th>User</th>
-									<th>Publish Date</th>
+									<th>Publish At</th>
 									<th>Status</th>
 									<th width="150">Actions</th>
 								</tr>
@@ -153,9 +153,6 @@ var DatatablesBasicPaginations = {
                 title: "Actions",
                 orderable: !1,
                 render: function(a, e, n, t) {
-
-                	console.log(n);
-
                 	var html = '\n<a style="margin-right:5px" href="{{env('APP_URL')}}/posts/edit/'+n[0]+'" class="m-portlet__nav-link btn m-btn btn btn-outline-primary m-btn--icon m-btn--icon-only m-btn--pill" title="Edit">\n<i class="la la-edit"></i>\n</a>';
 
                 	if(n[5] != 'pending') {

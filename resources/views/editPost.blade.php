@@ -147,7 +147,7 @@
 										<div class="form-group m-form__group row">
 											<label class="col-form-label" style="padding-left: 15px;">Publish Schedule</label>
 											<div class="col-lg-12 col-md-12 col-sm-12">
-												<input value="{{ $data['publish_schedule'] }}" type="text" name="publish_schedule" class="form-control" id="m_datetimepicker_1" readonly placeholder="Select date & time to publish schedule" />
+												<input value="{{ $data['publish_schedule'] }}" type="text" name="publish_schedule" class="form-control" id="m_datetimepicker_1" placeholder="Select date & time to publish schedule" />
 											</div>
 										</div>
 									</div>
@@ -227,7 +227,7 @@
 
 
 		$('.summernote').summernote({
-			height: 400,
+			height: 450,
 			popover: {
 			  image: [
 			    ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
@@ -257,6 +257,14 @@
 			    ['insert', ['picture','link', 'video', 'table']],
 			    ['misc', ['fullscreen', 'codeview', 'undo', 'redo', 'help']]
 			],
+		    callbacks: {
+		        onImageUpload: function(image) {
+		            uploadImage(image[0], function (res) {
+		            	var image = $('<img>').attr('src', '{{env('API_URL')}}/postThumb/' + res.data);
+		            	$('#summernote').summernote("insertNode", image[0]);
+		            });
+		        }
+		    }
 		});
 
 		$(".btn-preview").click(function() {
@@ -283,18 +291,6 @@
 		        }
 		    });
 		}
-
-		$('#summernote').summernote({
-		    height: 450,
-		    callbacks: {
-		        onImageUpload: function(image) {
-		            uploadImage(image[0], function (res) {
-		            	var image = $('<img>').attr('src', '{{env('API_URL')}}/postThumb/' + res.data);
-		            	$('#summernote').summernote("insertNode", image[0]);
-		            });
-		        }
-		    }
-		});
 
 		$("[name='title']").blur(function () {
 			var title = $(this).val();

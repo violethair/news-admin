@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Post;
 use App\Category;
 use App\User;
+use App\CategoryRelation;
 
 class PostController extends Controller
 {
@@ -18,9 +19,6 @@ class PostController extends Controller
 
         $data['category'] = Category::select(['id','name'])->orderBy('name')->get()->toArray();
         $data['categoryJson'] = json_encode($data['category']);
-        if($user->group_id == 1)
-        $data['user'] = User::select(['id','name'])->where('id',$user->id)->orderBy('name')->get()->toArray();
-        else
         $data['user'] = User::select(['id','name'])->orderBy('name')->get()->toArray();
         $data['userJson'] = json_encode($data['user']);
 
@@ -83,6 +81,22 @@ class PostController extends Controller
         if(!empty($req->publish_schedule)) $post->publish_schedule = $req->publish_schedule;
         $post->save();
 
+        $insert = new CategoryRelation;
+        $insert->post_id = $post->id;
+        $insert->cat_id = $post->cat_id;
+        $insert->created = date('Y-m-d H:i:s');
+        $insert->save();
+
+        if(!empty($req->sub_cat_id)) {
+            foreach($req->sub_cat_id as $key=>$value) {
+                $insert = new CategoryRelation;
+                $insert->post_id = $post->id;
+                $insert->cat_id = $value;
+                $insert->created = date('Y-m-d H:i:s');
+                $insert->save();
+            }
+        }
+
         Session::flash('success', 'Post successfully');
         return redirect('/posts');
     }
@@ -98,12 +112,7 @@ class PostController extends Controller
 
         $user = Session::get('user');
 
-        if($user->group_id == 1) {
-            if($user->id != $data->user_id) {
-                Session::flash('error', 'You do not have permission to edit');
-                return redirect()->back();
-            }
-        }
+        
         $data = $data->toArray();
         $data['cat_after'] = explode('|', trim($data['cat_after'], '|'));
         $data['relate_id'] = explode(',', $data['relate_id']);
@@ -111,7 +120,11 @@ class PostController extends Controller
         foreach($data['relate_id'] as $key=>$value) {
             $data['relate_id'][$key] = [];
             $data['relate_id'][$key]['id'] = $value;
-            $data['relate_id'][$key]['name'] = Post::find($value)->name;
+            $temp = Post::find($value);
+            if(!empty($temp))
+                $data['relate_id'][$key]['name'] = Post::find($value)->name;
+            else
+                $data['relate_id'][$key]['name'] = 'Not found';
         }
 
     	$data['content'] = preg_replace('/(https:\/\/img.iholding.io)\/(.*)fill\!(.*)/', env('API_URL') . '/postThumb/${3}', $data['content']);
@@ -137,6 +150,16 @@ class PostController extends Controller
 	    	return redirect()->back()->withInput($req->input());
         }
 
+        $user = Session::get('user');
+        $post = Post::find($req->id);
+
+        if($user->group_id == 1) {
+            if($user->id != $post->user_id) {
+                Session::flash('error', 'You do not have permission to edit');
+                return redirect()->back();
+            }
+        }
+
         $cat_after = "";
         if(!empty($req->sub_cat_id)) {
             foreach($req->sub_cat_id as $key=>$value) {
@@ -152,8 +175,7 @@ class PostController extends Controller
             }
             $relate_id = rtrim($relate_id, ",");
         }
-
-        $post = Post::find($req->id);
+        
         if($req->tags != $post->tag) $post->relate_id = $this->findRelate($req->tags);
         $post->name = $req->title;
         $post->cat_id = $req->cat_id;

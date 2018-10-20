@@ -32,19 +32,19 @@ class ApiController extends Controller
             }
         }
 
-        if($user->group_id == 1) {
-            $data = Post::where('user_id', $user->id);
-            if(!empty($search)) {
-                foreach ($search as $key => $value) {
-                    if($value['col'] == 'name')
-                    $data = $data->where($value['col'], 'LIKE', '%'.$value['value'].'%');
-                    else
-                    $data = $data->where($value['col'], $value['value']);
-                }
-            }
-            $recordsFiltered = $data->orderBy($query['columns'][$query['order'][0]['column']]['name'], $query['order'][0]['dir'])->count();
-            $data = $data->orderBy($query['columns'][$query['order'][0]['column']]['name'], $query['order'][0]['dir'])->skip($page * $length)->take($length)->get()->toArray();
-        } else {
+        // if($user->group_id == 1) {
+        //     $data = Post::where('user_id', $user->id);
+        //     if(!empty($search)) {
+        //         foreach ($search as $key => $value) {
+        //             if($value['col'] == 'name')
+        //             $data = $data->where($value['col'], 'LIKE', '%'.$value['value'].'%');
+        //             else
+        //             $data = $data->where($value['col'], $value['value']);
+        //         }
+        //     }
+        //     $recordsFiltered = $data->orderBy($query['columns'][$query['order'][0]['column']]['name'], $query['order'][0]['dir'])->count();
+        //     $data = $data->orderBy($query['columns'][$query['order'][0]['column']]['name'], $query['order'][0]['dir'])->skip($page * $length)->take($length)->get()->toArray();
+        // } else {
             $data = Post::select("*");
             if(!empty($search)) {
                 foreach ($search as $key => $value) {
@@ -56,7 +56,7 @@ class ApiController extends Controller
             }
             $recordsFiltered = $data->orderBy($query['columns'][$query['order'][0]['column']]['name'], $query['order'][0]['dir'])->count();
             $data = $data->orderBy($query['columns'][$query['order'][0]['column']]['name'], $query['order'][0]['dir'])->skip($page * $length)->take($length)->get()->toArray();
-        }
+        // }
 
     	foreach($data as $key=>$value) {
     		$result[$key][0] = $value['id'];
@@ -65,7 +65,10 @@ class ApiController extends Controller
     		$result[$key][2] = $value['name'];
             $user = User::find($value['user_id']);
             $result[$key][3] = !empty($user) ? $user->name : 'Not found';
-    		$result[$key][4] = $value['publish_at'];
+            if($value['status'] != 'pending')
+            	$result[$key][4] = $value['publish_at'];
+            else
+            	$result[$key][4] = $value['publish_schedule'];
     		$result[$key][5] = $value['status'];
     	}
 
